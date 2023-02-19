@@ -1,0 +1,18 @@
+{
+  "name": "node-weather-application",
+  "version": "1.0.0",
+  "description": "Weather application to fetch current weather conditions by city name, zip code, or coordinates",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "keywords": [],
+  "author": "Raam Noble",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
