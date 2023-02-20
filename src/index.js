@@ -1,7 +1,11 @@
-const app = require("./app");
+const path = require("path");
 
-const port = process.env.PORT || 3000;
+const app = require("./app");
+const logger = require("./utils/logger");
+
+const port = process.env.PORT;
+const filename = path.basename(__filename);
 
 app.listen(port, () => {
-  console.log("Server is up on port " + port);
+  logger.info(`${filename}: Server is up on port ${port}`);
 });
