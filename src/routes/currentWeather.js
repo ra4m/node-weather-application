@@ -5,7 +5,6 @@ const path = require("path");
 const getCurrentWeather = require("../services/getCurrentWeather");
 const getCoordinatesByZipcode = require("../services/getCoordinatesByZipcode");
 const logger = require("../utils/logger");
-const { count } = require("console");
 
 const filename = path.basename(__filename);
 const router = new express.Router();
@@ -44,7 +43,7 @@ router.get("/weather-by-coordinates", async (req, res) => {
   }
 });
 
-// Get weather by coordinates
+// Get weather by zipcode
 router.get("/weather-by-zipcode", async (req, res) => {
   const { zipcode, country } = req.query;
 
@@ -73,8 +72,8 @@ router.get("/weather-by-zipcode", async (req, res) => {
     return;
   }
 
+  // Fetch the current weather after geocoding zipcode into coordinates
   try {
-    // Fetch the current weather after geocoding zipcode into coordinates
     const weatherResult = await getCurrentWeather(lat, lon);
     logger.info(
       `${filename}: /weather-by-zipcode: ${JSON.stringify(weatherResult)}`
