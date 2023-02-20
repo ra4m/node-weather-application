@@ -4,9 +4,9 @@ const getCoordinatesByZipcode = async (zipcode, country) => {
   let url;
 
   if (zipcode && country) {
-    url = `${process.env.GEOCODING_BASE_URL}?appid=${process.env.API_KEY}&zip=${zipcode},${country}`;
+    url = `${process.env.GEOCODING_ZIPCODE_BASE_URL}?appid=${process.env.API_KEY}&zip=${zipcode},${country}`;
   } else {
-    url = `${process.env.GEOCODING_BASE_URL}?appid=${process.env.API_KEY}&zip=${zipcode}`;
+    url = `${process.env.GEOCODING_ZIPCODE_BASE_URL}?appid=${process.env.API_KEY}&zip=${zipcode}`;
   }
 
   const result = await axios({

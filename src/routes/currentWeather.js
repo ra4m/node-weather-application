@@ -4,6 +4,7 @@ const path = require("path");
 
 const getCurrentWeather = require("../services/getCurrentWeather");
 const getCoordinatesByZipcode = require("../services/getCoordinatesByZipcode");
+const getCoordinatesByName = require("../services/getCoordinatesByName");
 const logger = require("../utils/logger");
 
 const filename = path.basename(__filename);
@@ -13,7 +14,7 @@ const router = new express.Router();
 router.get("/weather-by-coordinates", async (req, res) => {
   const { lat, lon } = req.body;
 
-  // Validation logic to ensure lat and lon values are set properly within the request body
+  // Validation logic to ensure lat and lon values are set only to numbers within the request body
   if (!lat || !lon) {
     res.status(400).send("Invalid body");
     return;
@@ -83,6 +84,46 @@ router.get("/weather-by-zipcode", async (req, res) => {
     return;
   } catch (e) {
     logger.error(`${filename}: /weather-by-zipcode: ${e.stack}`);
+    res.status(500).send();
+    return;
+  }
+});
+
+// Get weather by name
+router.get("/weather-by-name", async (req, res) => {
+  const { city, state, country } = req.body;
+
+  if (!city) {
+    res.status(400).send("City is required");
+    return;
+  }
+
+  // Retrieve coordinates using the input name
+  let lat, lon;
+  try {
+    const coordinatesResult = await getCoordinatesByName(city, state, country);
+    lat = coordinatesResult.lat;
+    lon = coordinatesResult.lon;
+    logger.info(
+      `${filename}: /weather-by-name: Lattitude & Longitude retrieved: ${lat}, ${lon}`
+    );
+  } catch (e) {
+    logger.error(`${filename}: /weather-by-name: ${e.stack}`);
+    res.status(400).send("Invalid inputs");
+    return;
+  }
+
+  // Fetch the current weather after geocoding name into coordinates
+  try {
+    const weatherResult = await getCurrentWeather(lat, lon);
+    logger.info(
+      `${filename}: /weather-by-name: ${JSON.stringify(weatherResult)}`
+    );
+
+    res.status(200).send(weatherResult);
+    return;
+  } catch (e) {
+    logger.error(`${filename}: /weather-by-name: ${e.stack}`);
     res.status(500).send();
     return;
   }
