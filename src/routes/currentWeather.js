@@ -12,34 +12,35 @@ const router = new express.Router();
 
 // Get weather by coordinates
 router.get("/weather-by-coordinates", async (req, res) => {
+  const { lat, lon } = req.body;
+
+  // Validation logic to ensure lat and lon values are set properly within the request body
+  if (!lat || !lon) {
+    res.status(400).send("Invalid body");
+    return;
+  }
+  if (typeof lat === "string" && !validator.isNumeric(lat)) {
+    res.status(400).send("Invalid lattitude");
+    return;
+  }
+  if (typeof lon === "string" && !validator.isNumeric(lon)) {
+    res.status(400).send("Invalid longitude");
+    return;
+  }
+
   try {
-    const { lat, lon } = req.body;
+    const result = await getCurrentWeather(lat, lon);
 
-    // Validation logic to ensure lat and lon values are set properly within the request body
-    if (!lat || !lon) {
-      throw new Error("Invalid body");
-    }
-    if (typeof lat === "string" && !validator.isNumeric(lat)) {
-      throw new Error("Invalid lattitude");
-    }
-    if (typeof lon === "string" && !validator.isNumeric(lon)) {
-      throw new Error("Invalid longitude");
-    }
+    logger.info(
+      `${filename}: /weather-by-coordinates: ${JSON.stringify(result)}`
+    );
 
-    try {
-      const result = await getCurrentWeather(lat, lon);
-
-      logger.info(
-        `${filename}: /weather-by-coordinates: ${JSON.stringify(result)}`
-      );
-      res.status(200).send(result);
-    } catch (e) {
-      logger.error(`${filename}: /weather-by-coordinates: ${e.stack}`);
-      res.status(500).send();
-    }
+    res.status(200).send(result);
+    return;
   } catch (e) {
     logger.error(`${filename}: /weather-by-coordinates: ${e.stack}`);
-    res.status(400).send(e.message);
+    res.status(500).send();
+    return;
   }
 });
 
@@ -78,6 +79,7 @@ router.get("/weather-by-zipcode", async (req, res) => {
     logger.info(
       `${filename}: /weather-by-zipcode: ${JSON.stringify(weatherResult)}`
     );
+
     res.status(200).send(weatherResult);
     return;
   } catch (e) {
